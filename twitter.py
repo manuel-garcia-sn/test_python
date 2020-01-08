@@ -1,6 +1,8 @@
 import settings
 import requests
+import datetime
 from requests.auth import HTTPBasicAuth
+from mongo_client import MongoClient
 
 
 class TwitterApi:
@@ -13,9 +15,24 @@ class TwitterApi:
             self.set_token()
 
         response = self.get_response_from_twitter()
-        print(response.json())
+        client = MongoClient()
 
-        return response.json()
+        for tweet in response.json()['statuses']:
+            data = {
+                'type': 'tweet',
+                'internal_id': tweet['id'],
+                'title': tweet['text'],
+                'user': {
+                    'name': tweet['user']['name'],
+                    'screen_name': tweet['user']['screen_name'],
+                },
+                'created_at': datetime.datetime.strptime(tweet['created_at'], '%a %b %d %X %z %Y')
+            }
+
+            if client.collection.find_one({'type': 'tweet', 'internal_id': tweet['id']}) is None:
+                client.collection.insert_one(data)
+
+        return response.json()['statuses']
 
     def set_token(self):
         payload = {
@@ -35,8 +52,9 @@ class TwitterApi:
             'Authorization': 'Bearer ' + self.token
         }
         payload = {
-            'q': '#sngularrocks',
-            'lang': 'es'
+            'q': 'sngularrocks',
+            'lang': 'es',
+            'count': 50
         }
         response = requests.get(self.url + '1.1/search/tweets.json', params=payload, headers=headers)
 
@@ -45,5 +63,3 @@ class TwitterApi:
 
 t = TwitterApi()
 t.get_tweets()
-
-
