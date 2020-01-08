@@ -1,6 +1,6 @@
 import unittest
 
-import database_operations
+from old import database_operations
 
 
 class TestDatabaseOperations(unittest.TestCase):
