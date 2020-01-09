@@ -20,12 +20,10 @@ def add_item():
     # Add item to the list
     res_data = database_operations.add_to_list(item)
 
-    # Return error if item not added
     if res_data is None:
-        response = Response("{'error': 'Item not added - " + item + "'}", status=400, mimetype='application/json')
+        response = Response("{'error': 'Item not added - {}'}".format(item), status=400, mimetype='application/json')
         return response
 
-    # Return response
     response = Response(json.dumps(res_data), mimetype='application/json')
 
     return response
