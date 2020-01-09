@@ -1,0 +1,5 @@
+/.idea
+mydatabase
+.env
+/venv
+/__pycache__
