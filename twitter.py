@@ -10,6 +10,7 @@ class TwitterApi:
         self.url = 'https://api.twitter.com/'
         self.token = ''
 
+    @property
     def get_tweets(self):
         while self.get_response_from_twitter().status_code != 200:
             self.set_token()
@@ -18,13 +19,26 @@ class TwitterApi:
         client = MongoClient()
 
         for tweet in response.json()['statuses']:
+            find_urls = (tweet['entities']['urls'])
+
+            if find_urls:
+                urls = {
+                    'short_url': (find_urls[0])['url'],
+                    'expanded_url': (find_urls[0])['expanded_url'],
+                }
+            else:
+                urls = {}
+
             data = {
                 'type': 'tweet',
                 'internal_id': tweet['id'],
                 'title': tweet['text'],
+                'link': 'https://twitter.com/' + tweet['user']['screen_name'] + '/status/' + tweet['id_str'],
+                'urls': urls,
                 'user': {
                     'name': tweet['user']['name'],
                     'screen_name': tweet['user']['screen_name'],
+                    'profile_image_url': tweet['user']['profile_image_url_https']
                 },
                 'created_at': datetime.datetime.strptime(tweet['created_at'], '%a %b %d %X %z %Y')
             }
@@ -62,4 +76,4 @@ class TwitterApi:
 
 
 t = TwitterApi()
-t.get_tweets()
+t.get_tweets
