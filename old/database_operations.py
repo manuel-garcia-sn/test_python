@@ -16,7 +16,7 @@ def add_to_list(item):
             c = conn.cursor()
 
             # Keep the initial status as Not Started
-            c.execute('insert into items(item, status) values(?,?)', (item, NOT_STARTED))
+            c.execute('insert into items(name, status) values(?,?)', (item, NOT_STARTED))
 
             # We commit to save the change
             conn.commit()
