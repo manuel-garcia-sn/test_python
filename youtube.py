@@ -9,9 +9,14 @@ class YoutubeApi:
         self.url = 'https://www.googleapis.com/youtube/v3/'
         self.token = ''
 
-    def get_videos(self):
-        response = self.get_response_from_youtube()
-        client = MongoClient()
+    def videos(self):
+        response = self._get_response()
+        client = MongoClient(
+            host=settings.MONGODB_HOST,
+            port=settings.MONGODB_PORT,
+            db=settings.MONGODB_DATABASE,
+            collection=settings.MONGODB_COLLECTION
+        )
 
         for video in response.json()['items']:
             date = (video['snippet']['publishedAt'])[:-5]
@@ -20,7 +25,7 @@ class YoutubeApi:
                 'internal_id': video['id']['videoId'],
                 'title': video['snippet']['title'],
                 'description': video['snippet']['description'],
-                'link': 'https://www.youtube.com/watch?v=' + video['id']['videoId'],
+                'link': 'https://www.youtube.com/watch?v={}'.format(video['id']['videoId']),
                 'user': {
                     'name': video['snippet']['channelId'],
                     'screen_name': video['snippet']['channelTitle'],
@@ -34,18 +39,17 @@ class YoutubeApi:
 
         return response.json()['items']
 
-    def get_response_from_youtube(self):
+    def _get_response(self):
         payload = {
             'key': settings.YOUTUBE_SECRET,
             'q': 'sngularrocks',
             'type': 'video',
             'part': 'snippet'
         }
-        response = requests.get(self.url + 'search', params=payload)
-        print(response.status_code)
+        response = requests.get('{}search'.format(self.url), params=payload)
 
         return response
 
 
 y = YoutubeApi()
-y.get_videos()
+y.videos()
