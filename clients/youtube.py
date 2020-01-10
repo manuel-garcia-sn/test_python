@@ -1,7 +1,8 @@
 import sys
-sys.path.append('../')
 import settings
 import requests
+
+sys.path.append('../')
 
 
 class YoutubeApi:

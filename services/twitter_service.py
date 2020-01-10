@@ -1,10 +1,10 @@
 import sys
-sys.path.append('../')
-
 import settings
 from datetime import datetime
 from clients.twitter import TwitterApi
 from mongo_client import MongoClient
+
+sys.path.append('../')
 
 
 class TwitterService:

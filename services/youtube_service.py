@@ -1,10 +1,10 @@
 import sys
-sys.path.append('../')
-
 import settings
 from datetime import datetime
 from clients.youtube import YoutubeApi
 from mongo_client import MongoClient
+
+sys.path.append('../')
 
 
 class YoutubeService:
@@ -42,3 +42,4 @@ class YoutubeService:
 
 y = YoutubeService()
 y.add_videos_to_feed()
+

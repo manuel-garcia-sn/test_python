@@ -1,10 +1,9 @@
 import sys
-sys.path.append('../')
 import settings
 import requests
-from datetime import datetime
 from requests.auth import HTTPBasicAuth
-from mongo_client import MongoClient
+
+sys.path.append('../')
 
 
 class TwitterApi:
@@ -19,14 +18,14 @@ class TwitterApi:
             self.set_token()
             response = self._get_response()
 
-        return response.json()['statuses']
+        return response.json().get('statuses', {})
 
     def set_token(self):
         payload = {
             'grant_type': 'client_credentials'
         }
         response = requests.post(
-            '{}oauth2/token'.format(self.url),
+            '{}{}'.format(self.url, 'oauth2/token'),
             params=payload,
             auth=HTTPBasicAuth(settings.TWITTER_KEY, settings.TWITTER_SECRET)
         )
