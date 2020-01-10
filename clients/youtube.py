@@ -21,6 +21,7 @@ class YoutubeApi:
         )
 
         for video in response.json()['items']:
+            print(video)
             date = (video['snippet']['publishedAt'])[:-5]
             data = {
                 'type': 'youtube',
