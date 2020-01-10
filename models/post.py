@@ -13,12 +13,10 @@ class Post:
             collection=settings.MONGODB_COLLECTION
         )
 
-    def all(self, post_type):
+    def all(self, post_type=None):
         query = {}
         if post_type:
-            query = {
-                'type': post_type
-            }
+            query.update({'type': post_type})
 
         posts = self.client.collection.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 

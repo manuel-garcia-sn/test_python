@@ -1,8 +1,7 @@
 import json
 
-from bson import json_util
-from flask import Blueprint, render_template, abort, request, Response
-from models.post import Post
+from flask import Blueprint, request, Response
+from views.posts import Posts
 
 api_routes = Blueprint('api_routes', __name__)
 
@@ -19,9 +18,7 @@ def show():
 
 @api_routes.route('/feed')
 def feed():
-    post_type = request.args.get('type')
-    posts = Post()
-    return Response(json.dumps(posts.all(post_type), default=json_util.default), mimetype='application/json')
+    return Posts().list()
 
 
 @api_routes.route('/item/new', methods=['POST'])
