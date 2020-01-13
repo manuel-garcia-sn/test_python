@@ -8,12 +8,12 @@ class TwitterApi:
         self.url = 'https://api.twitter.com/'
         self.token = ''
 
-    def tweets(self):
-        response = self._get_response()
+    def tweets(self, query='sngularrocks'):
+        response = self._get_response(query)
 
         if response.status_code != 200:
             self.set_token()
-            response = self._get_response()
+            response = self._get_response(query)
 
         return response.json().get('statuses', {})
 
@@ -27,19 +27,20 @@ class TwitterApi:
             auth=HTTPBasicAuth(TWITTER_KEY, TWITTER_SECRET)
         )
 
-        self.token = response.json()['access_token']
+        self.token = response.json().get('access_token')
 
-    def _get_response(self):
+    def _get_response(self, query):
+        print(query)
         headers = {
             'content-type': 'application/json',
             'Authorization': 'Bearer {}'.format(self.token)
         }
         payload = {
-            'q': 'sngularrocks',
+            'q': query,
             'lang': 'es',
             'count': 50
         }
-        response = requests.get('{}1.1/search/tweets.json'.format(self.url), params=payload, headers=headers)
+        response = requests.get('{}{}'.format(self.url, '1.1/search/tweets.json'), params=payload, headers=headers)
 
         return response
 

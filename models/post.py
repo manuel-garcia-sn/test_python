@@ -10,14 +10,15 @@ class Post:
             host=MONGODB_HOST,
             port=MONGODB_PORT,
             db=MONGODB_DATABASE,
-            collection=MONGODB_COLLECTION
         )
 
-    def all(self, post_type=None):
-        query = {}
+    def all(self, q, post_type=None):
+        query = {'$text': {'$search': q}}
         if post_type:
             query.update({'type': post_type})
 
-        posts = self.client.collection.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
+        print(query)
+
+        posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
