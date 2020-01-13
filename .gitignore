@@ -3,3 +3,8 @@ mydatabase
 .env
 /venv
 /__pycache__
+/models/__pycache/*
+/config/__pycache/*
+/clients/__pycache/*
+/old/__pycache/*
+/views/__pycache/*
