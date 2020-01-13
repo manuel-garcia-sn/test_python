@@ -1,26 +1,22 @@
-import sys
-import settings
 from datetime import datetime
 from clients.youtube import YoutubeApi
 from mongo_client import MongoClient
-
-sys.path.append('../')
+from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_COLLECTION
 
 
 class YoutubeService:
     @staticmethod
     def add_videos_to_feed():
         client = MongoClient(
-            host=settings.MONGODB_HOST,
-            port=settings.MONGODB_PORT,
-            db=settings.MONGODB_DATABASE,
-            collection=settings.MONGODB_COLLECTION
+            host=MONGODB_HOST,
+            port=MONGODB_PORT,
+            db=MONGODB_DATABASE,
+            collection=MONGODB_COLLECTION
         )
 
         youtube_api = YoutubeApi()
         videos = youtube_api.videos()
         for video in videos:
-            print(video)
             date = (video['snippet']['publishedAt'])[:-5]
             data = {
                 'type': 'youtube',

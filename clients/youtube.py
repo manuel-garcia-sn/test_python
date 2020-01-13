@@ -1,8 +1,6 @@
-import sys
-import settings
 import requests
 
-sys.path.append('../')
+from config.settings import YOUTUBE_SECRET
 
 
 class YoutubeApi:
@@ -17,7 +15,7 @@ class YoutubeApi:
 
     def _get_response(self):
         payload = {
-            'key': settings.YOUTUBE_SECRET,
+            'key': YOUTUBE_SECRET,
             'q': 'sngularrocks',
             'type': 'video',
             'part': 'snippet'

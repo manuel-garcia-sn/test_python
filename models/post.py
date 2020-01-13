@@ -1,16 +1,16 @@
 import pymongo
 
-import settings
+from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_COLLECTION
 from mongo_client import MongoClient
 
 
 class Post:
     def __init__(self):
         self.client = MongoClient(
-            host=settings.MONGODB_HOST,
-            port=settings.MONGODB_PORT,
-            db=settings.MONGODB_DATABASE,
-            collection=settings.MONGODB_COLLECTION
+            host=MONGODB_HOST,
+            port=MONGODB_PORT,
+            db=MONGODB_DATABASE,
+            collection=MONGODB_COLLECTION
         )
 
     def all(self, post_type=None):

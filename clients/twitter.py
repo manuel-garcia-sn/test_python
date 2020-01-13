@@ -1,9 +1,6 @@
-import sys
-import settings
+from config.settings import TWITTER_KEY, TWITTER_SECRET
 import requests
 from requests.auth import HTTPBasicAuth
-
-sys.path.append('../')
 
 
 class TwitterApi:
@@ -27,7 +24,7 @@ class TwitterApi:
         response = requests.post(
             '{}{}'.format(self.url, 'oauth2/token'),
             params=payload,
-            auth=HTTPBasicAuth(settings.TWITTER_KEY, settings.TWITTER_SECRET)
+            auth=HTTPBasicAuth(TWITTER_KEY, TWITTER_SECRET)
         )
 
         self.token = response.json()['access_token']

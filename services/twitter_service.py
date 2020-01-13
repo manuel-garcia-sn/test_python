@@ -1,20 +1,18 @@
 import sys
-import settings
 from datetime import datetime
 from clients.twitter import TwitterApi
 from mongo_client import MongoClient
-
-sys.path.append('../')
+from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_COLLECTION
 
 
 class TwitterService:
     @staticmethod
     def add_tweets_to_feed():
         client = MongoClient(
-            host=settings.MONGODB_HOST,
-            port=settings.MONGODB_PORT,
-            db=settings.MONGODB_DATABASE,
-            collection=settings.MONGODB_COLLECTION
+            host=MONGODB_HOST,
+            port=MONGODB_PORT,
+            db=MONGODB_DATABASE,
+            collection=MONGODB_COLLECTION
         )
 
         twitter_api = TwitterApi()

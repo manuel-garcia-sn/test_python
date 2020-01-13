@@ -1,7 +1,4 @@
-from old import database_operations
-import json
-
-from flask import Flask, request, Response
+from flask import Flask
 from routes import api_routes
 
 
