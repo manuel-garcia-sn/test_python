@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from bson import ObjectId
+
 from clients.twitter import TwitterApi
 from mongo_client import MongoClient
 from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
@@ -17,8 +19,8 @@ class TwitterService:
         tweets = self._get_tweets_from_api(query)
 
         for tweet in tweets:
-            user = self._set_user(tweet=tweet)
-            self._set_tweet_from_user(tweet=tweet, user=user)
+            user_id = self._set_user(tweet=tweet)
+            self._set_tweet_from_user(tweet=tweet, user_id=user_id)
 
     @staticmethod
     def _get_tweets_from_api(query):
@@ -45,6 +47,8 @@ class TwitterService:
                 'tweets_count': 0,
                 'validated': None
             })
+            print('User from insertion:', user)
+            user_id = user.inserted_id
         else:
             self.client.db.users.update_one({
                 'twitter_id': twitter_user.get('id'),
@@ -58,10 +62,12 @@ class TwitterService:
                 },
             })
 
-        print(user)
-        return user
+            user_id = ObjectId(user.get('_id'))
+            print('User from update:', user_id)
 
-    def _set_tweet_from_user(self, tweet, user):
+        return user_id
+
+    def _set_tweet_from_user(self, tweet, user_id):
         # Insert or update tweets from a given user in feed collection
         self.client.db.feed.update_one(
             {
@@ -71,7 +77,7 @@ class TwitterService:
                     tweet.get('user').get('screen_name'),
                     tweet.get('id')
                 ),
-                'user': user.get('_id')
+                'user': user_id
             },
             {
                 '$setOnInsert': {
