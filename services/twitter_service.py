@@ -28,27 +28,41 @@ class TwitterService:
 
             user = tweet.get('user')
 
-            data = {
-                'type': 'tweet',
-                'internal_id': tweet.get('id'),
-                'title': tweet.get('text'),
-                'link': 'https://twitter.com/{}/status/{}'.format(
-                    tweet.get('user').get('screen_name'),
-                    tweet.get('id')
-                ),
-                'urls': urls,
-                'user': {
-                    'name': user.get('name'),
-                    'screen_name': user.get('screen_name'),
-                    'profile_image_url': user.get('profile_image_url_https')
-                },
-                'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y')
-            }
+            tweet = client.db.feed.find_one({'type': 'tweet', 'internal_id': tweet.get('id')})
 
-            if client.db.feed.find_one({'type': 'tweet', 'internal_id': tweet.get('id')}) is None:
-                client.db.feed.insert_one(data)
+            if tweet:
+                tweet.update('retweet_count', tweet.get('retweet_count'))
+                tweet.update('favorite_count', tweet.get('favorite_count'))
+
+                update = {
+                    'retweet_count': tweet.get('retweet_count'),
+                    'favorite_count': tweet.get('favorite_count')
+                }
+
+                client.db.feed.update_one({'_id': tweet.get('_id')}, {"$set": update}, upsert=False)
+
+            # data = {
+            #     'type': 'tweet',
+            #     'internal_id': tweet.get('id'),
+            #     'title': tweet.get('text'),
+            #     'link': 'https://twitter.com/{}/status/{}'.format(
+            #         tweet.get('user').get('screen_name'),
+            #         tweet.get('id')
+            #     ),
+            #     'urls': urls,
+            #     'retweet_count': tweet.get('retweet_count'),
+            #     'favorite_count': tweet.get('favorite_count'),
+            #     'user': {
+            #         'name': user.get('name'),
+            #         'screen_name': user.get('screen_name'),
+            #         'profile_image_url': user.get('profile_image_url_https')
+            #     },
+            #     'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y')
+            # }
+            #
+            # if tweet is None:
+            #     client.db.feed.insert_one(data)
 
 
 t = TwitterService()
 t.add_tweets_to_feed()
-
