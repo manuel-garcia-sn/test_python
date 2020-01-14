@@ -1,6 +1,6 @@
 import pymongo
 
-from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_COLLECTION
+from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
 from mongo_client import MongoClient
 
 

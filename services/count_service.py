@@ -1,5 +1,4 @@
 from bson import ObjectId
-
 from mongo_client import MongoClient
 from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
 
