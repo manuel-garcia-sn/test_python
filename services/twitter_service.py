@@ -35,15 +35,9 @@ class TwitterService:
                     'validated': None
                 }
 
-                user = client.db.users.insert(found_user)
-
-                print(user.twitter_id)
-
-
-
-
-
-
+                user_id = client.db.users.insert_one(found_user)
+            else:
+                user_id = found_user.get('_id')
 
             find_urls = (tweet.get('entities').get('urls'))
 
@@ -54,11 +48,9 @@ class TwitterService:
                     'expanded_url': find_urls[0].get('expanded_url'),
                 }
 
-
             found_tweet = client.db.feed.find_one({'type': 'tweet', 'internal_id': tweet.get('id')})
 
             if found_tweet:
-                print('encontrado')
                 update = {
                     'retweet_count': tweet.get('retweet_count'),
                     'favorite_count': tweet.get('favorite_count')
@@ -77,11 +69,7 @@ class TwitterService:
                 'urls': urls,
                 'retweet_count': tweet.get('retweet_count'),
                 'favorite_count': tweet.get('favorite_count'),
-                'user': {
-                    'name': twitter_user.get('name'),
-                    'screen_name': twitter_user.get('screen_name'),
-                    'profile_image_url': twitter_user.get('profile_image_url_https')
-                },
+                'user': user_id,
                 'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y')
             }
 
