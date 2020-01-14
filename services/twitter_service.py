@@ -80,16 +80,17 @@ class TwitterService:
                     'retweet_count': tweet.get('retweet_count'),
                     'favorite_count': tweet.get('favorite_count'),
                     'user': user_id,
-                    'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y')
+                    'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y'),
+                    'validated': None
                 }
 
                 tweet_id = client.db.feed.insert_one(data).inserted_id
                 print('inserted:', tweet_id)
 
-            client.db.users.update_one(
-                {'_id': ObjectId(user_id)},
-                {'$push': {'tweets':  tweet_id}}
-            )
+            # client.db.users.update_one(
+            #     {'_id': ObjectId(user_id)},
+            #     {'$push': {'tweets':  tweet_id}}
+            # )
 
 
 t = TwitterService()
