@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pymongo
 
 from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
@@ -22,3 +24,30 @@ class Post:
         posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
+
+    def add_tweet_from_user(self, tweet, user_id):
+        self.client.db.feed.update_one(
+            {
+                'twitter_id': tweet.get('id'),
+                'title': tweet.get('text'),
+                'link': 'https://twitter.com/{}/status/{}'.format(
+                    tweet.get('user').get('screen_name'),
+                    tweet.get('id')
+                ),
+                'user': user_id
+            },
+            {
+                '$setOnInsert': {
+                    'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y'),
+                    'validated': None,
+                },
+                '$set': {
+                    'retweet_count': tweet.get('retweet_count'),
+                    'favorite_count': tweet.get('favorite_count')
+                }
+            },
+            upsert=True
+        )
+
+    def drop_collection(self):
+        self.client.db.feed.drop()
