@@ -14,6 +14,8 @@ class TwitterService:
             port=MONGODB_PORT,
             db=MONGODB_DATABASE
         )
+        
+        self._drop_collections()
 
     def add_tweets_to_feed(self, query='sngularrocks'):
         tweets = self._get_tweets_from_api(query)
@@ -30,42 +32,25 @@ class TwitterService:
         return tweets
 
     def _set_user(self, tweet):
-        twitter_user = tweet.get('user')
+        profile = self._get_profile(tweet.get('user'))
+        initial_count = self._get_initial_count()
 
-        # Insert or update user in users collection
-        user = self.client.db.users.find_one({
-            'twitter_id': twitter_user.get('id'),
-            'twitter_name': twitter_user.get('name')
-        })
+        user = self.client.db.users.find_one(profile)
 
         if user is None:
-            user = self.client.db.users.insert_one({
-                'twitter_id': twitter_user.get('id'),
-                'twitter_name': twitter_user.get('name'),
-                'retweet_count': 0,
-                'favorite_count': 0,
-                'tweets_count': 0,
-                'validated': None
-            })
+            user = self.client.db.users.insert_one({**profile, **initial_count})
             print('User from insertion:', user)
             user_id = user.inserted_id
         else:
-            self.client.db.users.update_one({
-                'twitter_id': twitter_user.get('id'),
-                'twitter_name': twitter_user.get('name')
-            }, {
-                '$set': {
-                    'retweet_count': 0,
-                    'favorite_count': 0,
-                    'tweets_count': 0,
-                    'validated': None
-                },
-            })
+            self.client.db.users.update_one(profile, {'$set': initial_count})
 
             user_id = ObjectId(user.get('_id'))
             print('User from update:', user_id)
 
-        return user_id
+        return {
+            'user_id': user_id,
+            'profile': profile,
+        }
 
     def _set_tweet_from_user(self, tweet, user_id):
         # Insert or update tweets from a given user in feed collection
@@ -91,6 +76,28 @@ class TwitterService:
             },
             upsert=True
         )
+
+    def _drop_collections(self):
+        self.client.db.feed.drop()
+        self.client.db.users.drop()
+
+    @staticmethod
+    def _get_profile(twitter_user):
+        profile = {
+            'twitter_id': twitter_user.get('id'),
+            'twitter_name': twitter_user.get('name')
+        }
+
+        return profile
+
+    @staticmethod
+    def _get_initial_count():
+        return {
+            'retweet_count': 0,
+            'favorite_count': 0,
+            'tweets_count': 0,
+            'validated': None
+        }
 
 
 t = TwitterService()
