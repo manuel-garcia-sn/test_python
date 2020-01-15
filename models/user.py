@@ -6,11 +6,15 @@ class User(BaseModel):
     def __init__(self, collection='users'):
         super().__init__(collection)
 
+    def all(self):
+        return self.client.db.users.find({})
+
     def add_user(self, tweet):
         profile = self.get_profile(user=tweet.get('user'))
         initial_count = self.get_initial_count()
+        initial_validation = self.get_initial_validation()
 
-        return self.update_or_create(profile, initial_count)
+        return self.update_or_create(profile, {**initial_count, **initial_validation})
 
     def update_or_create(self, profile, initial_count):
         user = self.client.db.users.find_one(profile)
@@ -31,6 +35,15 @@ class User(BaseModel):
             'profile': profile,
         }
 
+    def reset_counters(self):
+        self.client.db.users.update_many({}, {
+            '$set': {
+                'retweet_count': 0,
+                'favorite_count': 0,
+                'tweets_count': 0
+            }
+        })
+
     @staticmethod
     def get_profile(user):
         profile = {
@@ -46,6 +59,11 @@ class User(BaseModel):
             'retweet_count': 0,
             'favorite_count': 0,
             'tweets_count': 0,
+        }
+
+    @staticmethod
+    def get_initial_validation():
+        return {
             'validated': None
         }
 

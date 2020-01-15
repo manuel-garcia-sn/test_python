@@ -1,5 +1,7 @@
 from datetime import datetime
 import pymongo
+from bson import ObjectId
+
 from models.base_model import BaseModel
 
 
@@ -18,6 +20,9 @@ class Post(BaseModel):
 
         return list(posts)
 
+    def find_by_user_id(self, user_id):
+        return self.client.db.feed.find({'user': ObjectId(user_id)})
+
     def add_tweet_from_user(self, tweet, user_id):
         self.client.db.feed.update_one(
             {
@@ -34,10 +39,22 @@ class Post(BaseModel):
                     'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y'),
                     'validated': None,
                 },
-                '$set': {
-                    'retweet_count': tweet.get('retweet_count'),
-                    'favorite_count': tweet.get('favorite_count')
-                }
+                '$set': self._set_counters(tweet)
             },
             upsert=True
         )
+
+    def update_user_count(self, user_id, tweet):
+        self.client.db.users.update_one(
+            {'_id': user_id},
+            {
+                '$inc': self._set_counters(tweet)
+            }
+        )
+
+    @staticmethod
+    def _set_counters(tweet):
+        return {
+            'retweet_count': tweet.get('retweet_count'),
+            'favorite_count': tweet.get('favorite_count')
+        }
