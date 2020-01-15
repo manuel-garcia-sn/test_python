@@ -1,19 +1,10 @@
 from bson import ObjectId
-
-from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
-from mongo_client import MongoClient
+from models.base_model import BaseModel
 
 
-class User:
-    def __init__(self):
-        self.client = MongoClient(
-            host=MONGODB_HOST,
-            port=MONGODB_PORT,
-            db=MONGODB_DATABASE,
-        )
-
-    def drop_collection(self):
-        self.client.db.users.drop()
+class User(BaseModel):
+    def __init__(self, collection='users'):
+        super().__init__(collection)
 
     def add_user(self, tweet):
         profile = self.get_profile(user=tweet.get('user'))
@@ -27,15 +18,16 @@ class User:
         if user is None:
             user = self.client.db.users.insert_one({**profile, **initial_count})
             print('User from insertion:', user)
-            user_id = user.inserted_id
-        else:
-            self.client.db.users.update_one(profile, {'$set': initial_count})
 
-            user_id = ObjectId(user.get('_id'))
-            print('User from update:', user_id)
+            return {
+                'user_id': user.inserted_id,
+                'profile': profile,
+            }
+
+        self.client.db.users.update_one(profile, {'$set': initial_count})
 
         return {
-            'user_id': user_id,
+            'user_id': ObjectId(user.get('_id')),
             'profile': profile,
         }
 

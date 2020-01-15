@@ -7,8 +7,6 @@ class TwitterService:
     def __init__(self):
         self.post = Post()
         self.user = User()
-        self.post.drop_collection()
-        self.user.drop_collection()
 
     def add_tweets_to_feed(self, query='sngularrocks'):
         tweets = self._get_tweets_from_api(query)

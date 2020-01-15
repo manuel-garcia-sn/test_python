@@ -1,18 +1,11 @@
 from datetime import datetime
-
 import pymongo
-
-from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
-from mongo_client import MongoClient
+from models.base_model import BaseModel
 
 
-class Post:
-    def __init__(self):
-        self.client = MongoClient(
-            host=MONGODB_HOST,
-            port=MONGODB_PORT,
-            db=MONGODB_DATABASE,
-        )
+class Post(BaseModel):
+    def __init__(self, collection='feed'):
+        super().__init__(collection)
 
     def all(self, q, post_type=None):
         query = {'$text': {'$search': q}}
@@ -48,6 +41,3 @@ class Post:
             },
             upsert=True
         )
-
-    def drop_collection(self):
-        self.client.db.feed.drop()
