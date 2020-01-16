@@ -1,7 +1,7 @@
 import json
 
 from flask import Blueprint, request, Response
-from views.posts import Posts
+from views.posts import Posts, AddPostView
 
 api_routes = Blueprint('api_routes', __name__)
 
@@ -23,17 +23,4 @@ def feed():
 
 @api_routes.route('/item/new', methods=['POST'])
 def add_item():
-    # Get item from the POST body
-    req_data = request.get_json()
-    item = req_data['item']
-
-    # Add item to the list
-    res_data = database_operations.add_to_list(item)
-
-    if res_data is None:
-        response = Response("{'error': 'Item not added - {}'}".format(item), status=400, mimetype='application/json')
-        return response
-
-    response = Response(json.dumps(res_data), mimetype='application/json')
-
-    return response
+    return AddPostView.perform_create()
