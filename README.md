@@ -35,7 +35,7 @@ rm -rf py_name_project_env
 ## Desactivate virtualenv
 ```
 which pip
-desactivate
+deactivate
 which pip
 ```
 
