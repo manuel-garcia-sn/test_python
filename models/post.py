@@ -1,16 +1,13 @@
+from datetime import datetime
 import pymongo
+from bson import ObjectId
 
-from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE, MONGODB_COLLECTION
-from mongo_client import MongoClient
+from models.base_model import BaseModel
 
 
-class Post:
-    def __init__(self):
-        self.client = MongoClient(
-            host=MONGODB_HOST,
-            port=MONGODB_PORT,
-            db=MONGODB_DATABASE,
-        )
+class Post(BaseModel):
+    def __init__(self, collection='feed'):
+        super().__init__(collection)
 
     def all(self, q, post_type=None):
         query = {'$text': {'$search': q}}
@@ -22,3 +19,42 @@ class Post:
         posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
+
+    def find_by_user_id(self, user_id):
+        return self.client.db.feed.find({'user': ObjectId(user_id)})
+
+    def add_tweet_from_user(self, tweet, user_id):
+        self.client.db.feed.update_one(
+            {
+                'twitter_id': tweet.get('id'),
+                'title': tweet.get('text'),
+                'link': 'https://twitter.com/{}/status/{}'.format(
+                    tweet.get('user').get('screen_name'),
+                    tweet.get('id')
+                ),
+                'user': user_id
+            },
+            {
+                '$setOnInsert': {
+                    'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y'),
+                    'validated': None,
+                },
+                '$set': self._set_counters(tweet)
+            },
+            upsert=True
+        )
+
+    def update_user_count(self, user_id, tweet):
+        self.client.db.users.update_one(
+            {'_id': user_id},
+            {
+                '$inc': self._set_counters(tweet)
+            }
+        )
+
+    @staticmethod
+    def _set_counters(tweet):
+        return {
+            'retweet_count': tweet.get('retweet_count'),
+            'favorite_count': tweet.get('favorite_count')
+        }

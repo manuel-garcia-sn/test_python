@@ -38,7 +38,7 @@ class TwitterApi:
         payload = {
             'q': query,
             'lang': 'es',
-            'count': 50
+            'count': 100
         }
         response = requests.get('{}{}'.format(self.url, '1.1/search/tweets.json'), params=payload, headers=headers)
 
