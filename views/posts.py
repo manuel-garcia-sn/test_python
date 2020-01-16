@@ -22,20 +22,20 @@ class AddPostView(View):
 
     @staticmethod
     def perform_create():
-        req_data = request.get_json()
+        try:
+            req_data = request.get_json()
+        except:
+            return Response(json.dumps({'error': 'Cannot create post. Post info is missing'}), status=400, mimetype='application/json')
 
-        if req_data is not None:
-            item = req_data['item']
-            # Add item to the list
-            post = Post()
-            res_data = post.client.db.feed.insert_one({'item': item})
+        item = req_data.get('item')
+        post = Post()
+        res_data = post.client.db.feed.insert_one({'item': item})
 
-            if res_data is None:
-                response = Response(json.dumps({'error': 'Item not added - {}'}), status=400, mimetype='application/json')
-                return response
-
-            response = Response(response=None, status=201, mimetype='application/json')
-
+        if res_data is None:
+            response = Response(json.dumps({'error': 'Item not added - {}'}), status=400, mimetype='application/json')
             return response
 
-        return Response(json.dumps({'error': 'Cannot create post. Post info is missing'}), status=400, mimetype='application/json')
+        response = Response(response=None, status=201, mimetype='application/json')
+
+        return response
+
