@@ -10,17 +10,17 @@ class User(BaseModel):
         return self.client.db.users.find({})
 
     def add_user(self, tweet):
-        profile = self.get_profile(user=tweet.get('user'))
-        initial_count = self.get_initial_count()
-        initial_validation = self.get_initial_validation()
+        profile = self._get_profile(user=tweet.get('user'))
+        initial_count = self._get_initial_count()
+        initial_validation = self._get_initial_validation()
 
         return self.update_or_create(profile, {**initial_count, **initial_validation})
 
-    def update_or_create(self, profile, initial_count):
+    def update_or_create(self, profile, initial_status):
         user = self.client.db.users.find_one(profile)
 
         if user is None:
-            user = self.client.db.users.insert_one({**profile, **initial_count})
+            user = self.client.db.users.insert_one({**profile, **initial_status})
             print('User from insertion:', user)
 
             return {
@@ -28,7 +28,8 @@ class User(BaseModel):
                 'profile': profile,
             }
 
-        self.client.db.users.update_one(profile, {'$set': initial_count})
+        self.client.db.users.update_one(profile, {'$set': initial_status})
+        # hay que pasar solo la inicialización, no la validación
 
         return {
             'user_id': ObjectId(user.get('_id')),
@@ -37,15 +38,11 @@ class User(BaseModel):
 
     def reset_counters(self):
         self.client.db.users.update_many({}, {
-            '$set': {
-                'retweet_count': 0,
-                'favorite_count': 0,
-                'tweets_count': 0
-            }
+            '$set': self._get_initial_count()
         })
 
     @staticmethod
-    def get_profile(user):
+    def _get_profile(user):
         profile = {
             'twitter_id': user.get('id'),
             'twitter_name': user.get('name')
@@ -54,7 +51,7 @@ class User(BaseModel):
         return profile
 
     @staticmethod
-    def get_initial_count():
+    def _get_initial_count():
         return {
             'retweet_count': 0,
             'favorite_count': 0,
@@ -62,7 +59,7 @@ class User(BaseModel):
         }
 
     @staticmethod
-    def get_initial_validation():
+    def _get_initial_validation():
         return {
             'validated': None
         }
