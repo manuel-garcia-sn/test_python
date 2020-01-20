@@ -1,14 +1,15 @@
 from clients.twitter import TwitterApi
 from models.user import User
 from models.post import Post
+from flask_script import Command
 
 
-class TwitterService:
+class TwitterService(Command):
     def __init__(self):
         self.post = Post()
         self.user = User()
 
-    def add_tweets_to_feed(self, query='sngularrocks'):
+    def run(self, query='sngularrocks'):
         tweets = self._get_tweets_from_api(query)
 
         for tweet in tweets:
@@ -22,6 +23,3 @@ class TwitterService:
 
         return tweets
 
-
-t = TwitterService()
-t.add_tweets_to_feed()
