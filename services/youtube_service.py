@@ -2,11 +2,12 @@ from datetime import datetime
 from clients.youtube import YoutubeApi
 from mongo_client import MongoClient
 from config.settings import MONGODB_HOST, MONGODB_PORT, MONGODB_DATABASE
+from flask_script import Command
 
 
-class YoutubeService:
+class YoutubeService(Command):
     @staticmethod
-    def add_videos_to_feed(query='sngularrocks'):
+    def run(query='sngularrocks'):
         client = MongoClient(
             host=MONGODB_HOST,
             port=MONGODB_PORT,
@@ -36,8 +37,3 @@ class YoutubeService:
 
             if client.db.feed.find_one({'type': 'youtube', 'internal_id': video_id}) is None:
                 client.db.feed.insert_one(data)
-
-
-if __name__ == '__main__':
-    y = YoutubeService()
-    y.add_videos_to_feed()

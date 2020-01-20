@@ -1,13 +1,15 @@
 from models.post import Post
 from models.user import User
+from flask_script import Command
 
 
-class CountService:
+class CountService(Command):
     def __init__(self):
+        super().__init__()
         self.user = User()
         self.post = Post()
 
-    def calculate(self):
+    def run(self):
         self.user.reset_counters()
         print('counters back to 0')
         for user in self.user.all():
@@ -18,8 +20,3 @@ class CountService:
     def _process_user_tweets(self, user_id, tweets):
         for tweet in tweets:
             self.post.update_user_count(user_id=user_id, tweet=tweet)
-
-
-if __name__ == '__main__':
-    c = CountService()
-    c.calculate()
