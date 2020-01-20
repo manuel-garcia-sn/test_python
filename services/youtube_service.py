@@ -38,6 +38,6 @@ class YoutubeService:
                 client.db.feed.insert_one(data)
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     y = YoutubeService()
     y.add_videos_to_feed()

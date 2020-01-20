@@ -26,5 +26,6 @@ class YoutubeApi:
         return response
 
 
-y = YoutubeApi('sngularrocks')
-y.videos()
+if __name__ == '__main__':
+    y = YoutubeApi('sngularrocks')
+    y.videos()
