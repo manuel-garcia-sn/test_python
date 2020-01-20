@@ -20,5 +20,6 @@ class CountService:
             self.post.update_user_count(user_id=user_id, tweet=tweet)
 
 
-c = CountService()
-c.calculate()
+if __name__ == 'main':
+    c = CountService()
+    c.calculate()

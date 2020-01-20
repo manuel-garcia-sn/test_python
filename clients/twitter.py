@@ -45,5 +45,6 @@ class TwitterApi:
         return response
 
 
-t = TwitterApi()
-t.tweets()
+if __name__ == 'main':
+    t = TwitterApi()
+    t.tweets()

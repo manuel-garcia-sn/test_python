@@ -5,7 +5,6 @@ from flask import Response, Blueprint, request, Response
 from flask.views import View
 
 from models.post import Post
-from old import database_operations
 
 
 class Posts:
@@ -25,7 +24,11 @@ class AddPostView(View):
         try:
             req_data = request.get_json()
         except:
-            return Response(json.dumps({'error': 'Cannot create post. Post info is missing'}), status=400, mimetype='application/json')
+            return Response(
+                json.dumps({'error': 'Cannot create post. Post info is missing'}),
+                status=400,
+                mimetype='application/json'
+            )
 
         item = req_data.get('item')
         post = Post()
@@ -38,4 +41,3 @@ class AddPostView(View):
         response = Response(response=None, status=201, mimetype='application/json')
 
         return response
-

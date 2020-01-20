@@ -23,5 +23,6 @@ class TwitterService:
         return tweets
 
 
-t = TwitterService()
-t.add_tweets_to_feed()
+if __name__ == 'main':
+    t = TwitterService()
+    t.add_tweets_to_feed()
