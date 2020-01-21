@@ -1,7 +1,7 @@
 import json
 
 from bson import json_util
-from flask import Response
+from flask import Response, request
 from flask.views import View
 
 from models.user import User
@@ -10,8 +10,8 @@ from models.user import User
 class Users:
     @staticmethod
     def list():
-        # connect to model and return all users
+        validated = request.args.get('validated')
         users = User()
 
-        return Response(json.dumps(users.all(), default=json_util.default), mimetype='application/json')
+        return Response(json.dumps(users.all(validated), default=json_util.default), mimetype='application/json')
 

@@ -13,10 +13,11 @@ class CountService(Command):
         self.user.reset_counters()
         print('counters back to 0')
         for user in self.user.all():
-            user_id = user.get('_id')
-            tweets = self.post.find_by_user_id(user_id=user_id)
-            self._process_user_tweets(user_id=user_id, tweets=tweets)
+            print(user)
+            user_twitter_id = user.get('twitter_id')
+            tweets = self.post.find_by_user_twitter_id(user_tweeter_id=user_twitter_id)
+            self._process_user_tweets(user_twitter_id=user_twitter_id, tweets=tweets)
 
-    def _process_user_tweets(self, user_id, tweets):
+    def _process_user_tweets(self, user_twitter_id, tweets):
         for tweet in tweets:
-            self.post.update_user_count(user_id=user_id, tweet=tweet)
+            self.post.update_user_count(user_tweeter_id=user_twitter_id, tweet=tweet)

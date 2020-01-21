@@ -1,4 +1,5 @@
 from bson import ObjectId
+
 from models.base_model import BaseModel
 
 
@@ -6,8 +7,33 @@ class User(BaseModel):
     def __init__(self, collection='users'):
         super().__init__(collection)
 
-    def all(self):
-        users = self.client.db.users.find({}, {'_id': False})
+    def all(self, validated):
+        match = {}
+        if validated == 'true':
+            match.update({'validated': True})
+        elif validated == 'false':
+            match.update({'validated': False})
+
+        users = self.client.db.users.aggregate([
+            {
+                '$match': match
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'twitter_id': 1,
+                    'twitter_name': 1,
+                    'total': {'$sum': ['$retweet_count', '$favorite_count', '$tweets_count']},
+                    'retweet_count': 1,
+                    'favorite_count': 1,
+                    'tweets_count': 1
+                }
+            },
+            {
+                '$sort': {'total': -1}
+            }
+        ])
+
         return list(users)
 
     def add_user(self, tweet):
@@ -62,6 +88,5 @@ class User(BaseModel):
     @staticmethod
     def _get_initial_validation():
         return {
-            'validated': None
+            'validated': False
         }
-
