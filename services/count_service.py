@@ -11,9 +11,7 @@ class CountService(Command):
 
     def run(self):
         self.user.reset_counters()
-        print('counters back to 0')
         for user in self.user.all():
-            print(user)
             user_twitter_id = user.get('twitter_id')
             tweets = self.post.find_by_user_twitter_id(user_tweeter_id=user_twitter_id)
             self._process_user_tweets(user_twitter_id=user_twitter_id, tweets=tweets)

@@ -1,4 +1,5 @@
 from bson import ObjectId
+from helpers import str2bool
 
 from models.base_model import BaseModel
 
@@ -9,25 +10,16 @@ class User(BaseModel):
 
     def all(self, validated):
         match = {}
-        if validated == 'true':
-            match.update({'validated': True})
-        elif validated == 'false':
-            match.update({'validated': False})
+
+        if validated is not None:
+            match.update({'validated': str2bool(validated)})
 
         users = self.client.db.users.aggregate([
             {
                 '$match': match
             },
             {
-                '$project': {
-                    '_id': 0,
-                    'twitter_id': 1,
-                    'twitter_name': 1,
-                    'total': {'$sum': ['$retweet_count', '$favorite_count', '$tweets_count']},
-                    'retweet_count': 1,
-                    'favorite_count': 1,
-                    'tweets_count': 1
-                }
+                '$project': self._get_user_projection()
             },
             {
                 '$sort': {'total': -1}
@@ -48,7 +40,6 @@ class User(BaseModel):
 
         if user is None:
             user = self.client.db.users.insert_one({**profile, **initial_status})
-            print('User from insertion:', user)
 
             return {
                 'user_id': user.inserted_id,
@@ -56,7 +47,7 @@ class User(BaseModel):
             }
 
         self.client.db.users.update_one(profile, {'$set': initial_status})
-        # hay que pasar solo la inicialización, no la validación
+        # TODO: hay que pasar solo la inicialización, no la validación
 
         return {
             'user_id': ObjectId(user.get('_id')),
@@ -89,4 +80,16 @@ class User(BaseModel):
     def _get_initial_validation():
         return {
             'validated': False
+        }
+
+    @staticmethod
+    def _get_user_projection():
+        return {
+            '_id': 0,
+            'twitter_id': 1,
+            'twitter_name': 1,
+            'total': {'$sum': ['$retweet_count', '$favorite_count', '$tweets_count']},
+            'retweet_count': 1,
+            'favorite_count': 1,
+            'tweets_count': 1
         }

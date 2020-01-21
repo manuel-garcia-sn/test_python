@@ -14,8 +14,6 @@ class Post(BaseModel):
         if post_type:
             query.update({'type': post_type})
 
-        print(query)
-
         posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
