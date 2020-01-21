@@ -1,7 +1,7 @@
 import json
 
 from bson import json_util
-from flask import Response, Blueprint, request, Response
+from flask import request, Response
 from flask.views import View
 
 from models.post import Post
@@ -18,7 +18,6 @@ class Posts:
 
 
 class AddPostView(View):
-
     @staticmethod
     def perform_create():
         try:

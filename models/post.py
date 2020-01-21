@@ -14,14 +14,15 @@ class Post(BaseModel):
         if post_type:
             query.update({'type': post_type})
 
-        print(query)
-
         posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
 
     def find_by_user_id(self, user_id):
         return self.client.db.feed.find({'user': ObjectId(user_id)})
+
+    def find_by_user_twitter_id(self, user_tweeter_id):
+        return self.client.db.feed.find({'user.profile.twitter_id': user_tweeter_id})
 
     def add_tweet_from_user(self, tweet, user_id):
         self.client.db.feed.update_one(
@@ -37,16 +38,16 @@ class Post(BaseModel):
             {
                 '$setOnInsert': {
                     'created_at': datetime.strptime(tweet.get('created_at'), '%a %b %d %X %z %Y'),
-                    'validated': None,
+                    'validated': False,
                 },
                 '$set': self._set_counters(tweet)
             },
             upsert=True
         )
 
-    def update_user_count(self, user_id, tweet):
+    def update_user_count(self, user_tweeter_id, tweet):
         self.client.db.users.update_one(
-            {'_id': user_id},
+            {'twitter_id': user_tweeter_id},
             {
                 '$inc': self._set_counters(tweet)
             }

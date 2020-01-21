@@ -30,7 +30,6 @@ class TwitterApi:
         self.token = response.json().get('access_token')
 
     def _get_response(self, query):
-        print(query)
         headers = {
             'content-type': 'application/json',
             'Authorization': 'Bearer {}'.format(self.token)
