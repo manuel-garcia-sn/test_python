@@ -7,7 +7,8 @@ class User(BaseModel):
         super().__init__(collection)
 
     def all(self):
-        return self.client.db.users.find({})
+        users = self.client.db.users.find({}, {'_id': False})
+        return list(users)
 
     def add_user(self, tweet):
         profile = self._get_profile(user=tweet.get('user'))

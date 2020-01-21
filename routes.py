@@ -1,7 +1,6 @@
-import json
-
-from flask import Blueprint, request, Response
+from flask import Blueprint
 from views.posts import Posts, AddPostView
+from views.users import Users
 
 api_routes = Blueprint('api_routes', __name__)
 
@@ -19,6 +18,11 @@ def show():
 @api_routes.route('/feed')
 def feed():
     return Posts().list()
+
+
+@api_routes.route('/users')
+def users():
+    return Users().list()
 
 
 @api_routes.route('/item/new', methods=['POST'])
