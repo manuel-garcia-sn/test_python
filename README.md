@@ -65,3 +65,14 @@ TWITTER_SECRET
 docker run -p 27017:27017 -d mongo:latest
 ```
 Now you can connect to DB on localhost:27017
+
+# Commands
+Get al tweets with certain hastag
+```
+python3 main.py twitter_service
+```
+
+Calculate user count posts
+```
+python3 main.py count_service
+```
