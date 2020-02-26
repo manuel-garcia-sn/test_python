@@ -25,6 +25,10 @@ class Post(BaseModel):
         return self.client.db.feed.find({'user.profile.twitter_id': user_tweeter_id})
 
     def add_tweet_from_user(self, tweet, user_id):
+        media_url = ''
+        if tweet.get('entities').get('media') is not None:
+            media_url = tweet.get('entities').get('media')[0].get('media_url_https')
+
         self.client.db.feed.update_one(
             {
                 'twitter_id': tweet.get('id'),
@@ -33,7 +37,9 @@ class Post(BaseModel):
                     tweet.get('user').get('screen_name'),
                     tweet.get('id')
                 ),
-                'user': user_id
+                'user': user_id,
+                'media_url': media_url,
+                "lang": tweet.get('metadata').get('iso_language_code')
             },
             {
                 '$setOnInsert': {
