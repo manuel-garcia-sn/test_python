@@ -13,5 +13,5 @@ class Users:
         validated = request.args.get('validated')
         users = User()
 
-        return Response(json.dumps(users.all(validated), default=json_util.default), mimetype='application/json')
+        return Response(json.dumps(users.all(validated=validated), default=json_util.default), mimetype='application/json')
 
