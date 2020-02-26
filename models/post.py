@@ -9,12 +9,17 @@ class Post(BaseModel):
     def __init__(self, collection='feed'):
         super().__init__(collection)
 
-    def all(self, q, post_type=None):
+    def all(self, q, page=1, post_type=None):
+        elements = 10
         query = {'$text': {'$search': q}}
         if post_type:
             query.update({'type': post_type})
 
-        posts = self.client.db.feed.find(query, {'_id': False}).sort([('created_at', pymongo.DESCENDING)])
+        skip = int((page - 1) * elements) if (page > 0) else int(0)
+
+        posts = self.client.db.feed.find(query, {'_id': False}).skip(skip) \
+            .limit(elements) \
+            .sort([('created_at', pymongo.DESCENDING)])
 
         return list(posts)
 
