@@ -10,7 +10,7 @@ class Settings:
     def last_settings():
         settings = Setting()
 
-        return Response(json.dumps(settings.all()[-1], default=json_util.default), mimetype='application/json')
+        return Response(json.dumps(settings.all(section=request.args.get('name')), default=json_util.default), mimetype='application/json')
 
     @staticmethod
     def store(data):

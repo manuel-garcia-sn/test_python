@@ -6,22 +6,28 @@ from models.base_model import BaseModel
 
 
 class Post(BaseModel):
-    def __init__(self, collection='feed'):
+    def __init__(self, collection='feed', elements=10):
         super().__init__(collection)
+        self.paginate_elements = elements
 
     def all(self, q, page=1, post_type=None):
-        elements = 10
         query = {'$text': {'$search': q}}
         if post_type:
             query.update({'type': post_type})
 
-        skip = int((page - 1) * elements) if (page > 0) else int(0)
+        skip = self.calculate_skip_results(self.paginate_elements, page)
 
-        posts = self.client.db.feed.find(query, {'_id': False}).skip(skip) \
-            .limit(elements) \
-            .sort([('created_at', pymongo.DESCENDING)])
+        posts = (self.client.db.feed.find(query, {'_id': False})
+                 .skip(skip)
+                 .limit(self.paginate_elements)
+                 .sort([('created_at', pymongo.DESCENDING)])
+                 )
 
         return list(posts)
+
+    @staticmethod
+    def calculate_skip_results(elements, page):
+        return int((page - 1) * elements) if (page > 0) else int(0)
 
     def find_by_user_id(self, user_id):
         return self.client.db.feed.find({'user': ObjectId(user_id)})
