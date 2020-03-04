@@ -15,11 +15,17 @@ def hello_world():
     setting = Setting()
     post = Post()
     user = User()
-    setting = setting.all()[-1]
+    settings = setting.all()
+
+    settings_formatted = {}
+
+    for element in settings:
+        settings_formatted[element.get('name')] = element.get('data').get('es')
+
     latest_ten_posts = post.all(q='sngularrocks')
     users = user.top_users()
 
-    return render_template('index.html', setting=setting, posts=latest_ten_posts, users=users)
+    return render_template('index.html', setting=settings_formatted, posts=latest_ten_posts, users=users)
 
 
 @api_routes.route('/test')

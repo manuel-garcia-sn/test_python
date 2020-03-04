@@ -22,10 +22,13 @@ class Setting(BaseModel):
 
     def store(self, settings):
         settings.update({'created_at': datetime.now()})
+        key_to_update = "data"
+        if settings.get('lang'):
+            key_to_update = (key_to_update + ".{}").format(settings.get('lang'))
 
-        self.client.db.settings.replace_one(
+        self.client.db.settings.update_one(
             {"name": settings.get('name')},
-            settings,
+            {'$set': {key_to_update: settings.get('data')}},
             upsert=True
         )
 
