@@ -1,0 +1,102 @@
+<html>
+<head>
+    <title>{{ setting.general.hashtag }}</title>
+</head>
+<body>
+<section>
+    <h1> - Section Opening</h1>
+    <h3>{{ setting.opening.text_light }}</h3>
+    <h5>{{ setting.opening.text_bold }}</h5>
+</section>
+
+<section>
+    <h1> - Section Share</h1>
+    <h2>{{ setting.general.hashtag }}</h2>
+    <h3>{{ setting.share.text_bold }}</h3>
+    <span>
+        1464 <br>
+        {{ setting.share.text_left }} <br>
+    </span>
+    <span>
+        132412 <br>
+        {{ setting.share.text_right }}
+    </span>
+
+    {% for link in posts %}
+    <div>
+        {% if link.media_url %}
+        <img src="{{ link.media_url }}" alt="" style="width: 150px">
+        {% endif %}
+        <h4>User: {{ link.user.profile.twitter_name }}</h4>
+        <h6>Content: {{ link.title }}</h6>
+        <link rel="stylesheet" href="{{ link.link }}">
+    </div>
+    {% endfor %}
+
+    <button id="show_more">
+        {{ setting.share.show_more }}
+    </button>
+</section>
+
+<section>
+    <h1> - Section Have Fun</h1>
+    <h2>{{ setting.general.hashtag }}</h2>
+    <h3>{{ setting.have_fun.text_bold }}</h3>
+</section>
+
+<section>
+    <h1> - Section Community</h1>
+    <h2>{{ setting.general.hashtag }}</h2>
+    <h3>{{ setting.community.text_bold }}</h3>
+</section>
+
+<section>
+    <h1> - Section Popular</h1>
+    <h2>{{ setting.popular.text_ligth }}</h2>
+    <h3>{{ setting.popular.text_bold }}</h3>
+    {% for user in users %}
+    <div>
+        <h4>User: {{ user.twitter_name }}</h4>
+        <h6>Total: {{ user.total }}</h6>
+    </div>
+    {% endfor %}
+</section>
+
+<section>
+    <h1> - Section Join Us</h1>
+    <h2>{{ setting.join_us.text_bold }}</h2>
+    <h4>{{ setting.join_us.text_light }}</h4>
+    <button>{{ setting.join_us.button_text }}</button>
+</section>
+
+<section>
+    <h1> - Section Footer</h1>
+    <span>{{ setting.follow_us.follow_text }}</span>
+    {% for link in setting.follow_us.links %}
+    <div><p>{{ key }} link: <b>{{ link }}</b></p></div>
+    {% endfor %}
+</section>
+</body>
+<script>
+    var page = 2;
+    document.getElementById("show_more").addEventListener("click", function(){
+        fetchFeed();
+    });
+
+    function fetchFeed(){
+        fetch('http://127.0.0.1:5000/feed?page=' + page)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(posts) {
+        page++;
+        console.log(posts);
+
+        if (posts.length === 0) {
+            document.getElementById('show_more').remove();
+        }
+      });
+    }
+
+</script>
+</html>

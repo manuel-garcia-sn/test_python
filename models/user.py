@@ -8,7 +8,27 @@ class User(BaseModel):
     def __init__(self, collection='users'):
         super().__init__(collection)
 
-    def all(self, validated):
+    def top_users(self):
+        match = {'validated': str2bool('false')}
+
+        users = self.client.db.users.aggregate([
+            {
+                '$match': match
+            },
+            {
+                '$project': self._get_user_projection()
+            },
+            {
+                '$sort': {'total': -1}
+            },
+            {
+                '$limit': 5
+            }
+        ])
+
+        return list(users)
+
+    def all(self, validated='true'):
         match = {}
 
         if validated is not None:
@@ -56,6 +76,11 @@ class User(BaseModel):
 
     def reset_counters(self):
         self.client.db.users.update_many({}, {
+            '$set': self._get_initial_count()
+        })
+
+    def reset_counters_for_user(self, twitter_id):
+        self.client.db.users.update_one({'twitter_id': twitter_id}, {
             '$set': self._get_initial_count()
         })
 
