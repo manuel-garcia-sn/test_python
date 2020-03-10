@@ -79,6 +79,11 @@ class User(BaseModel):
             '$set': self._get_initial_count()
         })
 
+    def reset_counters_for_user(self, twitter_id):
+        self.client.db.users.update_one({'twitter_id': twitter_id}, {
+            '$set': self._get_initial_count()
+        })
+
     @staticmethod
     def _get_profile(user):
         profile = {

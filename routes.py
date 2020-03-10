@@ -38,6 +38,11 @@ def feed():
     return Posts().list()
 
 
+@api_routes.route('/feed', methods=['POST'])
+def update_feed():
+    return Posts().enable_and_disable()
+
+
 @api_routes.route('/users')
 def users():
     return Users().list()

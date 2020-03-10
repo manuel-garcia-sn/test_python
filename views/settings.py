@@ -13,7 +13,7 @@ class Settings:
         return Response(json.dumps(settings.all(section=request.args.get('name')), default=json_util.default), mimetype='application/json')
 
     @staticmethod
-    def store(data):
+    def store(data): ## TODO: Data viene de request.get_json(), se puede obtener auqí mismo
         setting = Setting()
         res_data = setting.store(data)
 

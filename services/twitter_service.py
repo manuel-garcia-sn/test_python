@@ -11,6 +11,8 @@ class TwitterService(Command):
         self.user = User()
 
     def run(self, query='sngularrocks'):
+        ## Añadir en la query exclude:replies exclude:retweets para omitir los retweets y las respuestas
+        query += ' exclude:replies exclude:retweets'
         tweets = self._get_tweets_from_api(query)
 
         for tweet in tweets:
@@ -23,4 +25,3 @@ class TwitterService(Command):
         tweets = twitter_api.tweets(query)
 
         return tweets
-

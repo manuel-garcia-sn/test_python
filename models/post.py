@@ -3,10 +3,11 @@ import pymongo
 from bson import ObjectId
 
 from models.base_model import BaseModel
+from models.user import User
 
 
 class Post(BaseModel):
-    def __init__(self, collection='feed', elements=10):
+    def __init__(self, collection='feed', elements=2):
         super().__init__(collection)
         self.paginate_elements = elements
 
@@ -33,7 +34,9 @@ class Post(BaseModel):
         return self.client.db.feed.find({'user': ObjectId(user_id)})
 
     def find_by_user_twitter_id(self, user_tweeter_id):
-        return self.client.db.feed.find({'user.profile.twitter_id': user_tweeter_id})
+        return self.client.db.feed.find(
+            {'user.profile.twitter_id': user_tweeter_id, 'validated': True}
+        )
 
     def add_tweet_from_user(self, tweet, user_id):
         media_url = ''
@@ -42,8 +45,8 @@ class Post(BaseModel):
 
         self.client.db.feed.update_one(
             {
-                'twitter_id': tweet.get('id'),
-                'title': tweet.get('text'),
+                'twitter_id': str(tweet.get('id')),
+                'title': tweet.get('full_text'),
                 'link': 'https://twitter.com/{}/status/{}'.format(
                     tweet.get('user').get('screen_name'),
                     tweet.get('id')
@@ -61,6 +64,16 @@ class Post(BaseModel):
             },
             upsert=True
         )
+
+    def find_user_and_update_count(self, twitter_id):
+        user_model = User()
+        user = self.client.db.users.find_one({'twitter_id': twitter_id})
+        user_twitter_id = user.get('twitter_id')
+        tweets = self.find_by_user_twitter_id(user_tweeter_id=user_twitter_id)
+        user_model.reset_counters_for_user(user_twitter_id)
+
+        for tweet in tweets:
+            self.update_user_count(user_tweeter_id=user_twitter_id, tweet=tweet)
 
     def update_user_count(self, user_tweeter_id, tweet):
         self.client.db.users.update_one(
