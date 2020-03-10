@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Add React in One Minute</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+</head>
+<body>
+<select onchange="updateLang()" name="lang" id="lang">
+    <option value="es">ES</option>
+    <option value="en">EN</option>
+</select>
+
+<h3>Settings</h3>
+<div class="general">
+
+</div>
+<div class="opening">
+
+</div>
+<div class="share">
+
+</div>
+<div class="have_fun">
+
+</div>
+<div class="community">
+
+</div>
+<div class="popular">
+
+</div>
+<div class="join_us">
+
+</div>
+<div class="follow_us">
+
+</div>
+
+<!-- Load React. -->
+<!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+<script>
+    var lang = 'es';
+
+    function updateLang() {
+        lang = document.getElementById("lang").value;
+    }
+</script>
+
+<!-- Load our React component. -->
+<script src="like_button.js"></script>
+</body>
+</html>

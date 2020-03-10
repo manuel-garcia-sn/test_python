@@ -4,3 +4,5 @@ mydatabase
 /venv
 __pycache__/*
 **/__pycache__/*
+front/node_modules
+front-react/node_modules
