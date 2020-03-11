@@ -7,3 +7,4 @@ class MongoClient:
         self.db = self.client[db]
 
         self.db.feed.create_index([('title', 'text')])
+        self.db.users.create_index([('twitter_name', 'text')])

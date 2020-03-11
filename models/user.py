@@ -5,11 +5,12 @@ from models.base_model import BaseModel
 
 
 class User(BaseModel):
-    def __init__(self, collection='users'):
+    def __init__(self, collection='users', elements=5):
         super().__init__(collection)
+        self.paginate_elements = elements
 
     def top_users(self):
-        match = {'validated': str2bool('false')}
+        match = {}
 
         users = self.client.db.users.aggregate([
             {
@@ -28,11 +29,16 @@ class User(BaseModel):
 
         return list(users)
 
-    def all(self, validated='true'):
+    def all(self, q='', page=1, validated='true'):
         match = {}
+
+        skip = self.calculate_skip_results(self.paginate_elements, page)
 
         if validated is not None:
             match.update({'validated': str2bool(validated)})
+
+        if q:
+            match.update({'$text': {'$search': q}})
 
         users = self.client.db.users.aggregate([
             {
@@ -43,6 +49,12 @@ class User(BaseModel):
             },
             {
                 '$sort': {'total': -1}
+            },
+            {
+                '$skip': skip
+            },
+            {
+                '$limit': self.paginate_elements
             }
         ])
 
@@ -84,6 +96,11 @@ class User(BaseModel):
             '$set': self._get_initial_count()
         })
 
+    def enable_and_disable(self, twitter_id, validated):
+        self.client.db.users.update_one({'twitter_id': twitter_id}, {
+            '$set': {'validated': validated}
+        })
+
     @staticmethod
     def _get_profile(user):
         profile = {
@@ -115,6 +132,11 @@ class User(BaseModel):
             'twitter_name': 1,
             'total': {'$sum': ['$retweet_count', '$favorite_count', '$tweets_count']},
             'retweet_count': 1,
+            'validated': 1,
             'favorite_count': 1,
             'tweets_count': 1
         }
+
+    @staticmethod
+    def calculate_skip_results(elements, page):
+        return int((page - 1) * elements) if (page > 0) else int(0)

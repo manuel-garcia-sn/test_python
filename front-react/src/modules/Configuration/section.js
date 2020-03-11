@@ -6,6 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import { withSnackbar } from 'notistack';
+import axios, { post } from 'axios';
 
 class Section extends React.Component {
     constructor(props) {
@@ -24,7 +25,32 @@ class Section extends React.Component {
     }
 
     handleChange(e) {
-        this.setState({[e.target.name]: e.target.value});
+        console.log(e)
+        //this.setState({[e.target.name]: e.target.value});
+
+        if (e.target.files !== null) {
+            this.fileUpload(e.target.files[0], e.target.name)
+        }
+    }
+
+    fileUpload(file, name){
+        let formData = new FormData();
+        formData.append('file',file)
+
+        fetch("http://localhost:5000/file-upload", {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({[name]: result['short_path']});
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
     }
 
     componentDidMount() {
@@ -99,14 +125,17 @@ class Section extends React.Component {
     render() {
         let inputs = []
         this.props.inputs.forEach(function (value, index) {
+            let type = value.type !== undefined ? value.type : 'text'
             let element = <Grid item xs={12}>
                 <TextField id={value.input_name}
                            name={value.input_name}
+                           type={type}
                            fullWidth
+                           helperText={value.type=== 'file' ? 'Current: ' + this.state[value.input_name] : ''}
                            style={{'marginBottom': '10px'}}
                            placeholder={value.placeholder}
                            label={value.placeholder}
-                           value={this.state[value.input_name]}
+                           value={type === 'text' ? this.state[value.input_name] : ''}
                            variant="outlined"
                            onChange={(e) => {
                                this.handleChange(e)

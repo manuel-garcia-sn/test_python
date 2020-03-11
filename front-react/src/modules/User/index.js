@@ -55,8 +55,25 @@ class Users extends React.Component {
         this.fetchData()
     }
 
+    handleChange = event => {
+        const self = this;
+
+        this.setState({'search': event.target.value})
+
+        if (self.state.typingTimeout) {
+            clearTimeout(self.state.typingTimeout);
+        }
+
+        self.setState({
+            'page': 1,
+            'typingTimeout': setTimeout(function () {
+                self.fetchData()
+            }, 1000)}
+        )
+    };
+
     fetchData() {
-        fetch("http://localhost:5000/users?q=" + this.state.search +"&page=" + this.state.page)
+        fetch("http://localhost:5000/users?search=" + this.state.search +"&page=" + this.state.page)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -77,14 +94,44 @@ class Users extends React.Component {
         this.setState({'page': this.state.page - 1}, this.fetchData)
     };
 
+    updateValidation = (e, twitter_id) => {
+        let validated = e.target.checked
+        console.log(e.target)
+        fetch("http://localhost:5000/users", {
+            method: 'POST',
+            body: JSON.stringify({
+                    twitter_id: twitter_id,
+                    validated: validated
+                }
+            ),
+            headers: {'Content-Type': 'application/json'}
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.props.enqueueSnackbar('Success.', {
+                        variant: 'success',
+                    })
+                    console.log(result)
+                },
+                (error) => {
+                    this.props.enqueueSnackbar('Error.' + error, {
+                        variant: 'error',
+                    })
+                    console.log(error)
+                }
+            )
+    }
+
     render() {
         const {classes} = this.props;
         return (
             <Grid item xs={10}>
-                <h3>Posts module</h3>
+                <h3>Users module</h3>
 
                 <TextField id='search'
                            name='search'
+                           autoComplete='off'
                            fullWidth
                            style={{'marginBottom': '10px'}}
                            placeholder='Search by hastag'

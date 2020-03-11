@@ -83,6 +83,7 @@ class Configuration extends React.Component {
                                 {input_name: 'text_bold', placeholder: 'Text Bold'},
                                 {input_name: 'text_left', placeholder: 'Text left'},
                                 {input_name: 'text_right', placeholder: 'Text right'},
+                                {input_name: 'image', placeholder: 'Image', type: 'file'},
                                 {input_name: 'show_more', placeholder: 'Show more'}
 
                             ]}

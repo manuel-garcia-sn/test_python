@@ -131,6 +131,7 @@ class Posts extends React.Component {
 
                 <TextField id='search'
                            name='search'
+                           autoComplete='off'
                            fullWidth
                            style={{'marginBottom': '10px'}}
                            placeholder='Search by hastag'
@@ -140,6 +141,8 @@ class Posts extends React.Component {
                            onChange={(e) => {
                                this.handleChange(e)
                            }}/>
+
+
 
                 <TableContainer component={Paper}>
                     <Table className={classes.table} aria-label="customized table">
