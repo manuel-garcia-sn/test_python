@@ -6,15 +6,38 @@ from flask.views import View
 
 from models.post import Post
 
-
 class Posts:
     @staticmethod
     def list():
         post_type = request.args.get('type')
+        page = int(request.args.get('page', 1))
         query = request.args.get('q', 'sngularrocks')
         posts = Post()
 
-        return Response(json.dumps(posts.all(query, post_type), default=json_util.default), mimetype='application/json')
+        return Response(json.dumps(posts.all(query, page, post_type), default=json_util.default),
+                        mimetype='application/json')
+
+    @staticmethod
+    def enable_and_disable():
+        post = Post()
+        request_data = request.get_json()
+
+        post.client.db.feed.update_one(
+            {"twitter_id": request_data.get('twitter_id')},
+            {'$set': {'validated': request_data.get('validated')}},
+        )
+
+        post_object = post.client.db.feed.find_one({"twitter_id": request_data.get('twitter_id')})
+        twitter_id = post_object.get('user').get('profile').get('twitter_id')
+
+        post.find_user_and_update_count(twitter_id)
+
+        return Response(json.dumps(
+            post_object,
+            default=json_util.default),
+            status=201,
+            mimetype='application/json'
+        )
 
 
 class AddPostView(View):

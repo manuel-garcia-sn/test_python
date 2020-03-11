@@ -9,13 +9,21 @@ class TwitterApi:
         self.token = ''
 
     def tweets(self, query='sngularrocks'):
-        response = self._get_response(query)
+        has_more_results = True
+        tweets = []
 
-        if response.status_code != 200:
-            self.set_token()
-            response = self._get_response(query)
+        while has_more_results:
+            response = self._get_response(query, has_more_results)
 
-        return response.json().get('statuses', {})
+            if response.status_code != 200:
+                self.set_token()
+                response = self._get_response(query)
+
+            has_more_results = response.json().get('search_metadata').get('next_results', False)
+            query = {}
+            tweets.extend(response.json().get('statuses', {}))
+
+        return tweets
 
     def set_token(self):
         payload = {
@@ -29,17 +37,20 @@ class TwitterApi:
 
         self.token = response.json().get('access_token')
 
-    def _get_response(self, query):
+    def _get_response(self, query, next_results=''):
         headers = {
             'content-type': 'application/json',
             'Authorization': 'Bearer {}'.format(self.token)
         }
         payload = {
             'q': query,
-            'lang': 'es',
-            'count': 100
+            'count': 100,
+            'tweet_mode': 'extended'
         }
-        response = requests.get('{}{}'.format(self.url, '1.1/search/tweets.json'), params=payload, headers=headers)
+        response = requests.get('{}{}{}'.format(self.url, '1.1/search/tweets.json', next_results),
+                                params=payload,
+                                headers=headers
+                                )
 
         return response
 
