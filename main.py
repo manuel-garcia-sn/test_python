@@ -9,8 +9,10 @@ from services.youtube_service import YoutubeService
 from services.twitter_service import TwitterService
 
 app = Flask(__name__)
-CORS(app)
 app.register_blueprint(api_routes)
+app.secret_key = '76d78f6asdf8sd76f'
+app.config['SESSION_TYPE'] = 'filesystem'
+CORS(app, resources={r'/*': {"origins": '*'}})
 
 manager = Manager(app)
 
